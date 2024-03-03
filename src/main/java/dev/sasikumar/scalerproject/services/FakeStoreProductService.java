@@ -1,13 +1,14 @@
 package dev.sasikumar.scalerproject.services;
 
 import dev.sasikumar.scalerproject.DTOs.FakeStoreProductsDTO;
+import dev.sasikumar.scalerproject.DTOs.UpdateProductRequestDTO;
 import dev.sasikumar.scalerproject.models.Category;
 import dev.sasikumar.scalerproject.models.Product;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+
 @Service
 public class FakeStoreProductService implements ProductService{
 
@@ -18,15 +19,6 @@ public class FakeStoreProductService implements ProductService{
 
 
 
-    @Override
-    public Product getSingleProduct(Long productId) {
-        FakeStoreProductsDTO fakeStoreProduct = restTemplate.getForObject(
-                "https://fakestoreapi.com/products/" + productId,
-                FakeStoreProductsDTO.class
-        );
-        if(fakeStoreProduct == null) return new Product();
-        return fakeStoreProduct.toProduct();
-    }
 
     @Override
     public Product createProduct(String title,
@@ -53,26 +45,68 @@ public class FakeStoreProductService implements ProductService{
     }
 
     @Override
-    public Product updateProduct(Long productId) {
-        // for put, I think it's exactly same as create Product
-        return null;
-    }
-
-    @Override
-    public Product deleteProduct(Long productId) {
-        // I used getForObject, exactly same as get
-        FakeStoreProductsDTO deletedProduct = restTemplate.getForObject(
+    public Product getSingleProduct(Long productId) {
+        FakeStoreProductsDTO fakeStoreProduct = restTemplate.getForObject(
                 "https://fakestoreapi.com/products/" + productId,
                 FakeStoreProductsDTO.class
         );
+        if(fakeStoreProduct == null) return new Product();
+        return fakeStoreProduct.toProduct();
+    }
+
+    @Override
+    public Product updateProduct(Long productId, Product request) {
+
+        UpdateProductRequestDTO updateRequest = new UpdateProductRequestDTO();
+        updateRequest.setTitle(request.getTitle());
+        updateRequest.setPrice(request.getPrice());
+        updateRequest.setCategory(request.getCategory().getTitle());
+        updateRequest.setDescription(request.getDescription());
+        updateRequest.setImage(request.getImageUrl());
+
+        restTemplate.put(
+                "https://fakestoreapi.com/products/" + productId,
+                updateRequest
+        );
+
+        return request;
+    }
+
+
+    @Override
+    public Product deleteProduct(Long productId) {
+        restTemplate.delete("https://fakestoreapi.com/products/" + productId);
+        Product deletedProduct = getSingleProduct(productId);
 
         if(deletedProduct == null) return new Product();
-        return deletedProduct.toProduct();
+        return deletedProduct;
     }
 
     @Override
     public List<Product> getAllProducts() {
-        return null;
+
+        List<LinkedHashMap<String, String>> response = restTemplate.getForObject(
+                "https://fakestoreapi.com/products",
+                List.class
+        );
+        List<Product> allProducts = new ArrayList<>();
+
+        for(LinkedHashMap<String, String> product : response){
+            Product tempProduct = new Product();
+            tempProduct.setId(Long.valueOf (String.valueOf(product.get("id")) ));
+            tempProduct.setTitle(product.get("title"));
+            tempProduct.setDescription(product.get("description"));
+            tempProduct.setPrice(Double.parseDouble (String.valueOf(product.get("price")) ));
+            tempProduct.setImageUrl(product.get("image"));
+
+            Category temp = new Category();
+            temp.setTitle(product.get("category"));
+            tempProduct.setCategory(temp);
+
+            allProducts.add(tempProduct);
+        }
+
+        return allProducts;
     }
 
     @Override
@@ -93,7 +127,30 @@ public class FakeStoreProductService implements ProductService{
     }
 
     @Override
-    public List<Product> getAllProductsCategoryWise() {
-        return null;
+    public List<Product> getAllProductsCategoryWise(String category) {
+
+        List<LinkedHashMap<String, String>> response = restTemplate.getForObject(
+                "https://fakestoreapi.com/products/category/" + category,
+                List.class
+        );
+
+        List<Product> allProducts = new ArrayList<>();
+
+        for(LinkedHashMap<String, String> product : response){
+            Product tempProduct = new Product();
+            tempProduct.setId(Long.valueOf (String.valueOf(product.get("id")) ));
+            tempProduct.setTitle(product.get("title"));
+            tempProduct.setDescription(product.get("description"));
+            tempProduct.setPrice(Double.parseDouble (String.valueOf(product.get("price")) ));
+            tempProduct.setImageUrl(product.get("image"));
+
+            Category temp = new Category();
+            temp.setTitle(product.get("category"));
+            tempProduct.setCategory(temp);
+
+            allProducts.add(tempProduct);
+        }
+
+        return allProducts;
     }
 }

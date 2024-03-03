@@ -1,5 +1,6 @@
 package dev.sasikumar.scalerproject.services;
 
+import dev.sasikumar.scalerproject.DTOs.UpdateProductRequestDTO;
 import dev.sasikumar.scalerproject.models.Category;
 import dev.sasikumar.scalerproject.models.Product;
 
@@ -14,13 +15,14 @@ public interface ProductService {
                           String description,
                           String image);
 
-    Product updateProduct(Long productId);
+    Product updateProduct(Long productId, Product request);
+
     Product deleteProduct(Long productId);
 
     List<Product> getAllProducts();
 
     List<Category> getAllCategories();
 
-    List<Product> getAllProductsCategoryWise();
+    List<Product> getAllProductsCategoryWise(String category);
 
 }
