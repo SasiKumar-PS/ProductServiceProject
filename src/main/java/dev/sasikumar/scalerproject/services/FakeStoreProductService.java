@@ -1,10 +1,12 @@
 package dev.sasikumar.scalerproject.services;
 
 import dev.sasikumar.scalerproject.DTOs.FakeStoreProductsDTO;
+import dev.sasikumar.scalerproject.models.Category;
 import dev.sasikumar.scalerproject.models.Product;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
 import java.util.List;
 @Service
 public class FakeStoreProductService implements ProductService{
@@ -22,7 +24,7 @@ public class FakeStoreProductService implements ProductService{
                 "https://fakestoreapi.com/products/" + productId,
                 FakeStoreProductsDTO.class
         );
-
+        if(fakeStoreProduct == null) return new Product();
         return fakeStoreProduct.toProduct();
     }
 
@@ -46,12 +48,8 @@ public class FakeStoreProductService implements ProductService{
                 FakeStoreProductsDTO.class
         );
 
+        if(response == null) return new Product();
         return response.toProduct();
-    }
-
-    @Override
-    public List<Product> getProducts() {
-        return null;
     }
 
     @Override
@@ -67,6 +65,35 @@ public class FakeStoreProductService implements ProductService{
                 "https://fakestoreapi.com/products/" + productId,
                 FakeStoreProductsDTO.class
         );
+
+        if(deletedProduct == null) return new Product();
         return deletedProduct.toProduct();
+    }
+
+    @Override
+    public List<Product> getAllProducts() {
+        return null;
+    }
+
+    @Override
+    public List<Category> getAllCategories() {
+        List<String> allCategoryList = restTemplate.getForObject(
+                "https://fakestoreapi.com/products/categories",
+                List.class
+        );
+
+        List<Category> allcategory = new ArrayList<>();
+        for(String category : allCategoryList) {
+            Category tempCategory = new Category();
+            tempCategory.setTitle(category);
+            allcategory.add(tempCategory);
+        }
+
+        return allcategory;
+    }
+
+    @Override
+    public List<Product> getAllProductsCategoryWise() {
+        return null;
     }
 }

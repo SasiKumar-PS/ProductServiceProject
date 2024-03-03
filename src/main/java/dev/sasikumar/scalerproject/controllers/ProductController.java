@@ -1,11 +1,13 @@
 package dev.sasikumar.scalerproject.controllers;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import dev.sasikumar.scalerproject.DTOs.CreateProductRequestDTO;
+import dev.sasikumar.scalerproject.models.Category;
 import dev.sasikumar.scalerproject.models.Product;
 import dev.sasikumar.scalerproject.services.ProductService;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.*;
 
 
 // Acts like a waiter
@@ -61,5 +63,10 @@ public class ProductController {
     @DeleteMapping("/products/{Id}")
     public Product deleteProduct(@PathVariable("Id") Long productId){
         return productService.deleteProduct(productId);
+    }
+
+    @GetMapping("/products/categories")
+    public List<Category> getAllProductsCategoryWise(){
+        return productService.getAllCategories();
     }
 }
