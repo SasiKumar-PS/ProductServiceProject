@@ -1,9 +1,13 @@
 package dev.sasikumar.scalerproject.services;
 
+import dev.sasikumar.scalerproject.DTOs.CreateProductRequestDTO;
 import dev.sasikumar.scalerproject.DTOs.FakeStoreProductsDTO;
 import dev.sasikumar.scalerproject.DTOs.UpdateProductRequestDTO;
+import dev.sasikumar.scalerproject.exceptions.NotValidCategoryException;
+import dev.sasikumar.scalerproject.exceptions.ProductNotFoundException;
 import dev.sasikumar.scalerproject.models.Category;
 import dev.sasikumar.scalerproject.models.Product;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -21,18 +25,7 @@ public class FakeStoreProductService implements ProductService{
 
 
     @Override
-    public Product createProduct(String title,
-                                 double price,
-                                 String category,
-                                 String description,
-                                 String image) {
-
-        FakeStoreProductsDTO request = new FakeStoreProductsDTO();
-        request.setTitle(title);
-        request.setPrice(price);
-        request.setCategory(category);
-        request.setDescription(description);
-        request.setImage(image);
+    public Product createProduct(CreateProductRequestDTO request) {
 
         FakeStoreProductsDTO response = restTemplate.postForObject(
                 "https://fakestoreapi.com/products",
@@ -45,36 +38,34 @@ public class FakeStoreProductService implements ProductService{
     }
 
     @Override
-    public Product getSingleProduct(Long productId) {
-        FakeStoreProductsDTO fakeStoreProduct = restTemplate.getForObject(
+    public Product getSingleProduct(Long productId) throws ProductNotFoundException {
+        ResponseEntity<FakeStoreProductsDTO> fakeStoreProductResponse = restTemplate.getForEntity(
                 "https://fakestoreapi.com/products/" + productId,
                 FakeStoreProductsDTO.class
         );
-        if(fakeStoreProduct == null) return new Product();
+        FakeStoreProductsDTO fakeStoreProduct = fakeStoreProductResponse.getBody();
+
+        if(fakeStoreProduct == null){
+            throw new ProductNotFoundException("Product with id: "+ productId + " doesn't exist. Please try with a valid product id.");
+        }
+
         return fakeStoreProduct.toProduct();
     }
 
     @Override
-    public Product updateProduct(Long productId, Product request) {
-
-        UpdateProductRequestDTO updateRequest = new UpdateProductRequestDTO();
-        updateRequest.setTitle(request.getTitle());
-        updateRequest.setPrice(request.getPrice());
-        updateRequest.setCategory(request.getCategory().getTitle());
-        updateRequest.setDescription(request.getDescription());
-        updateRequest.setImage(request.getImageUrl());
+    public Product updateProduct(Long productId, UpdateProductRequestDTO request) {
 
         restTemplate.put(
                 "https://fakestoreapi.com/products/" + productId,
-                updateRequest
+                request
         );
 
-        return request;
+        return request.toProduct();
     }
 
 
     @Override
-    public Product deleteProduct(Long productId) {
+    public Product deleteProduct(Long productId) throws ProductNotFoundException {
         restTemplate.delete("https://fakestoreapi.com/products/" + productId);
         Product deletedProduct = getSingleProduct(productId);
 
@@ -85,25 +76,20 @@ public class FakeStoreProductService implements ProductService{
     @Override
     public List<Product> getAllProducts() {
 
-        List<LinkedHashMap<String, String>> response = restTemplate.getForObject(
+        FakeStoreProductsDTO[] response = restTemplate.getForObject(
                 "https://fakestoreapi.com/products",
-                List.class
+                FakeStoreProductsDTO[].class
         );
         List<Product> allProducts = new ArrayList<>();
 
-        for(LinkedHashMap<String, String> product : response){
-            Product tempProduct = new Product();
-            tempProduct.setId(Long.valueOf (String.valueOf(product.get("id")) ));
-            tempProduct.setTitle(product.get("title"));
-            tempProduct.setDescription(product.get("description"));
-            tempProduct.setPrice(Double.parseDouble (String.valueOf(product.get("price")) ));
-            tempProduct.setImageUrl(product.get("image"));
+        for(FakeStoreProductsDTO fakeStoreProducts : response){
+            Product Product = fakeStoreProducts.toProduct();
 
             Category temp = new Category();
-            temp.setTitle(product.get("category"));
-            tempProduct.setCategory(temp);
+            temp.setTitle(fakeStoreProducts.getCategory());
+            Product.setCategory(temp);
 
-            allProducts.add(tempProduct);
+            allProducts.add(Product);
         }
 
         return allProducts;
@@ -116,39 +102,31 @@ public class FakeStoreProductService implements ProductService{
                 List.class
         );
 
-        List<Category> allcategory = new ArrayList<>();
+        List<Category> allCategory = new ArrayList<>();
         for(String category : allCategoryList) {
             Category tempCategory = new Category();
             tempCategory.setTitle(category);
-            allcategory.add(tempCategory);
+            allCategory.add(tempCategory);
         }
 
-        return allcategory;
+        return allCategory;
     }
 
     @Override
-    public List<Product> getAllProductsCategoryWise(String category) {
+    public List<Product> getAllProductsCategoryWise(String category) throws NotValidCategoryException{
 
-        List<LinkedHashMap<String, String>> response = restTemplate.getForObject(
+        FakeStoreProductsDTO[] response = restTemplate.getForObject(
                 "https://fakestoreapi.com/products/category/" + category,
-                List.class
+                FakeStoreProductsDTO[].class
         );
 
+        if(response.length == 0){
+            throw new NotValidCategoryException("Category name : " + category + " is not valid a category, please provide valid category name.");
+        }
+
         List<Product> allProducts = new ArrayList<>();
-
-        for(LinkedHashMap<String, String> product : response){
-            Product tempProduct = new Product();
-            tempProduct.setId(Long.valueOf (String.valueOf(product.get("id")) ));
-            tempProduct.setTitle(product.get("title"));
-            tempProduct.setDescription(product.get("description"));
-            tempProduct.setPrice(Double.parseDouble (String.valueOf(product.get("price")) ));
-            tempProduct.setImageUrl(product.get("image"));
-
-            Category temp = new Category();
-            temp.setTitle(product.get("category"));
-            tempProduct.setCategory(temp);
-
-            allProducts.add(tempProduct);
+        for(FakeStoreProductsDTO product : response){
+            allProducts.add(product.toProduct());
         }
 
         return allProducts;

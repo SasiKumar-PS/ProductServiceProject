@@ -1,11 +1,20 @@
 package dev.sasikumar.scalerproject.controllers;
 
 import dev.sasikumar.scalerproject.DTOs.CreateProductRequestDTO;
+import dev.sasikumar.scalerproject.DTOs.ErrorDTO;
+import dev.sasikumar.scalerproject.DTOs.FakeStoreProductsDTO;
 import dev.sasikumar.scalerproject.DTOs.UpdateProductRequestDTO;
+import dev.sasikumar.scalerproject.exceptions.NotValidCategoryException;
+import dev.sasikumar.scalerproject.exceptions.ProductNotFoundException;
 import dev.sasikumar.scalerproject.models.Category;
 import dev.sasikumar.scalerproject.models.Product;
+import dev.sasikumar.scalerproject.services.FakeStoreProductService;
 import dev.sasikumar.scalerproject.services.ProductService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
@@ -31,42 +40,25 @@ public class ProductController {
     // 1. create a product
     @PostMapping("/products")
     public Product createProduct(@RequestBody CreateProductRequestDTO request) {
-        return productService.createProduct(
-                request.getTitle(),
-                request.getPrice(),
-                request.getCategory(),
-                request.getDescription(),
-                request.getImage()
-        );
+        return productService.createProduct(request);
     }
 
     // 2. get a single product
     @GetMapping("/products/{Id}")
-    public Product getSingleProductDetails(@PathVariable("Id") Long productId) {
+    public Product getSingleProductDetails(@PathVariable("Id") Long productId) throws ProductNotFoundException {
         return productService.getSingleProduct(productId);
     }
 
     // 3. update a product
-    @PutMapping("/product/{Id}")
+    @PutMapping("/products/{Id}")
     public Product updateProduct(@PathVariable("Id") Long productId,
                                  @RequestBody UpdateProductRequestDTO updateRequest) {
-
-        Product request = new Product();
-        request.setId(productId);
-        request.setTitle(updateRequest.getTitle());
-        request.setPrice(updateRequest.getPrice());
-        Category temp = new Category();
-        temp.setTitle(updateRequest.getCategory());
-        request.setCategory(temp);
-        request.setDescription(updateRequest.getDescription());
-        request.setImageUrl(updateRequest.getImage());
-
-        return productService.updateProduct(productId, request);
+        return productService.updateProduct(productId, updateRequest);
     }
 
     // 4. delete a product
     @DeleteMapping("/products/{Id}")
-    public Product deleteProduct(@PathVariable("Id") Long productId){
+    public Product deleteProduct(@PathVariable("Id") Long productId) throws ProductNotFoundException {
         return productService.deleteProduct(productId);
     }
 
@@ -83,8 +75,10 @@ public class ProductController {
     }
 
     // 7. get all products category wise
-    @GetMapping("/products/categories/{category}")
-    public List<Product> getAllProductsCategoryWise(@PathVariable("category") String category){
+    @GetMapping("/products/category/{category}")
+    public List<Product> getAllProductsCategoryWise(@PathVariable("category") String category) throws NotValidCategoryException{
         return productService.getAllProductsCategoryWise(category);
     }
+
+
 }

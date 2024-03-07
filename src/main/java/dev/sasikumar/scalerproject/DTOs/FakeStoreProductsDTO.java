@@ -32,5 +32,5 @@ public class FakeStoreProductsDTO {
         product.setCategory(category1);
 
         return product;
-    };
+    }
 }
