@@ -7,6 +7,7 @@ import dev.sasikumar.productserviceproject.exceptions.ProductNotFoundException;
 import dev.sasikumar.productserviceproject.models.Category;
 import dev.sasikumar.productserviceproject.models.Product;
 import dev.sasikumar.productserviceproject.services.ProductService;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
@@ -23,7 +24,9 @@ public class ProductController {
     private ProductService productService;
     private RestTemplate restTemplate;
 
-    public ProductController (ProductService productService, RestTemplate restTemplate) {
+    public ProductController (@Qualifier("selfProductService")
+                              ProductService productService,
+                              RestTemplate restTemplate) {
         this.productService = productService;
         this.restTemplate = restTemplate;
     }
@@ -51,7 +54,7 @@ public class ProductController {
 
     // 4. delete a product
     @DeleteMapping("/products/{Id}")
-    public Product deleteProduct(@PathVariable("Id") Long productId) throws ProductNotFoundException {
+    public String deleteProduct(@PathVariable("Id") Long productId) throws ProductNotFoundException {
         return productService.deleteProduct(productId);
     }
 

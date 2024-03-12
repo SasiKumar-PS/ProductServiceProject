@@ -10,6 +10,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Entity
 public class Category extends BaseModel{
     private String title;
 }

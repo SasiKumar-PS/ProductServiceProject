@@ -13,7 +13,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
 
-@Service
+@Service("fakeStoreProductService")
 public class FakeStoreProductService implements ProductService{
 
     private RestTemplate restTemplate;
@@ -65,12 +65,14 @@ public class FakeStoreProductService implements ProductService{
 
 
     @Override
-    public Product deleteProduct(Long productId) throws ProductNotFoundException {
-        restTemplate.delete("https://fakestoreapi.com/products/" + productId);
+    public String deleteProduct(Long productId) throws ProductNotFoundException {
         Product deletedProduct = getSingleProduct(productId);
+        if(deletedProduct == null){
+            throw new ProductNotFoundException("Product with Id: '" + productId + "' is not a valid product id");
+        }
 
-        if(deletedProduct == null) return new Product();
-        return deletedProduct;
+        restTemplate.delete("https://fakestoreapi.com/products/" + productId);
+        return "Product with Id: '" + productId + "' is deleted successfully!";
     }
 
     @Override

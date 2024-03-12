@@ -1,7 +1,6 @@
 package dev.sasikumar.productserviceproject.services;
 
 import dev.sasikumar.productserviceproject.DTOs.CreateProductRequestDTO;
-import dev.sasikumar.productserviceproject.DTOs.FakeStoreProductsDTO;
 import dev.sasikumar.productserviceproject.DTOs.UpdateProductRequestDTO;
 import dev.sasikumar.productserviceproject.exceptions.NotValidCategoryException;
 import dev.sasikumar.productserviceproject.exceptions.ProductNotFoundException;
@@ -17,7 +16,7 @@ public interface ProductService {
 
     Product updateProduct(Long productId, UpdateProductRequestDTO request);
 
-    Product deleteProduct(Long productId) throws ProductNotFoundException;
+    String deleteProduct(Long productId) throws ProductNotFoundException;
 
     List<Product> getAllProducts();
 
