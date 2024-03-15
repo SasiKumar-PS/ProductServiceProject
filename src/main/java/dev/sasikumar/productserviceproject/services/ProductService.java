@@ -14,7 +14,7 @@ public interface ProductService {
 
     Product createProduct(CreateProductRequestDTO request);
 
-    Product updateProduct(Long productId, UpdateProductRequestDTO request);
+    Product updateProduct(Long productId, UpdateProductRequestDTO request) throws ProductNotFoundException;
 
     String deleteProduct(Long productId) throws ProductNotFoundException;
 

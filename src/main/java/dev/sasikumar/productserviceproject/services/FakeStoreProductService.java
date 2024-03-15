@@ -16,7 +16,7 @@ import java.util.*;
 @Service("fakeStoreProductService")
 public class FakeStoreProductService implements ProductService{
 
-    private RestTemplate restTemplate;
+    private final RestTemplate restTemplate;
     public FakeStoreProductService(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
     }

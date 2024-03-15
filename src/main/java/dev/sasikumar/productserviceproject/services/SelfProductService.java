@@ -46,17 +46,33 @@ public class SelfProductService implements ProductService{
     }
 
     @Override
-    public Product updateProduct(Long productId, UpdateProductRequestDTO request) {
-        Product update = request.toProduct();
-        update.setId(productId);
+    public Product updateProduct(Long productId, UpdateProductRequestDTO request) throws ProductNotFoundException {
+        Product product = getSingleProduct(productId);
+
+        product.setId(productId);
+        if(request.getTitle() != null){
+            product.setTitle(request.getTitle());
+        }
+        if(request.getPrice() != null){
+            product.setPrice(request.getPrice());
+        }
+        if(request.getDescription() != null){
+            product.setDescription(request.getDescription());
+        }
+        if(request.getImage() != null){
+            product.setImageUrl(request.getImage());
+        }
+        if(request.getCategory() != null){
+            product.getCategory().setTitle(request.getCategory());
+        }
 
         Category category = categoryRepository.findByTitle(request.getCategory());
         if(category == null){
             category = new Category();
             category.setTitle(request.getCategory());
         }
-        update.setCategory(category);
-        return productRepository.save(update);
+        product.setCategory(category);
+        return productRepository.save(product);
     }
 
     @Override

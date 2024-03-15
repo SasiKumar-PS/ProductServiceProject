@@ -19,7 +19,7 @@ public class ApplicationConfiguration {
 
     we can annotate a class to create a special object of its class
     But if the class is already present in a library, we can't annotate there,
-    so we create a object from the library and
+    so we create an object from the library and
     make the created object as special by annotating as @Bean
 
      */
