@@ -15,9 +15,11 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> findAll();
     List<Product> findAllByCategoryTitleIs(String category);
 
+    //HQL Query
     @Query("select p.title as title, p.id as id, p.description as description, p.imageUrl as imageUrl from Product p where p.id = :productId")
     ProductProjection findByIdEquals(Long productId);
 
+    // SQL Query
     @Query(value = "select p.title as title, p.id as id from product p where p.category_id = :categoryId", nativeQuery = true)
     List<ProductProjection> findProductsByCategory_Id(@Param("categoryId") Long categoryId);
 }

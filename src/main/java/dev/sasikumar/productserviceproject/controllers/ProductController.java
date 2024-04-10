@@ -7,7 +7,6 @@ import dev.sasikumar.productserviceproject.exceptions.ProductNotFoundException;
 import dev.sasikumar.productserviceproject.models.Category;
 import dev.sasikumar.productserviceproject.models.Product;
 import dev.sasikumar.productserviceproject.services.ProductService;
-import dev.sasikumar.productserviceproject.services.CheckingProductService;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
