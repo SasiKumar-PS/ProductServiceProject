@@ -16,7 +16,7 @@ public interface ProductService {
 
     Product updateProduct(Long productId, UpdateProductRequestDTO request) throws ProductNotFoundException;
 
-    String deleteProduct(Long productId) throws ProductNotFoundException;
+    Long deleteProduct(Long productId) throws ProductNotFoundException;
 
     List<Product> getAllProducts();
 

@@ -76,13 +76,13 @@ public class SelfProductService implements ProductService{
     }
 
     @Override
-    public String deleteProduct(Long productId) throws ProductNotFoundException {
+    public Long deleteProduct(Long productId) throws ProductNotFoundException {
         Product deletedProduct = productRepository.findByIdIs(productId);
         if(deletedProduct == null){
             throw new ProductNotFoundException("Product with Id: '" + productId + "' is not a valid product id");
         }
         productRepository.deleteById(productId);
-        return "Product with Id: '" + productId + "' is deleted successfully!";
+        return productId;
     }
 
     @Override

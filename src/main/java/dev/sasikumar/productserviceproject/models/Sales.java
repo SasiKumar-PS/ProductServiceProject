@@ -9,12 +9,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.io.Serializable;
+
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class Sales {
+public class Sales implements Serializable {
     @Id
     @GeneratedValue(strategy =  GenerationType.AUTO)
     private Long id;

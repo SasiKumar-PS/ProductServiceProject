@@ -65,14 +65,14 @@ public class FakeStoreProductService implements ProductService{
 
 
     @Override
-    public String deleteProduct(Long productId) throws ProductNotFoundException {
+    public Long deleteProduct(Long productId) throws ProductNotFoundException {
         Product deletedProduct = getSingleProduct(productId);
         if(deletedProduct == null){
             throw new ProductNotFoundException("Product with Id: '" + productId + "' is not a valid product id");
         }
 
         restTemplate.delete("https://fakestoreapi.com/products/" + productId);
-        return "Product with Id: '" + productId + "' is deleted successfully!";
+        return productId;
     }
 
     @Override

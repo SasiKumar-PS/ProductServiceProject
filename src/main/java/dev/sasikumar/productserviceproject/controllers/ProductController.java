@@ -8,6 +8,10 @@ import dev.sasikumar.productserviceproject.models.Category;
 import dev.sasikumar.productserviceproject.models.Product;
 import dev.sasikumar.productserviceproject.services.ProductService;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,9 +19,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.*;
 
 
-// Acts like a waiter
-// Takes all responses and sends them to the service
 @RestController
+@EnableCaching
 public class ProductController {
     // Constructor, Dependency Injection
     private final ProductService productService;
@@ -29,32 +32,36 @@ public class ProductController {
 
 
     // 1. create a product
+    @CachePut(value = "product", key = "#product.id", unless = "#product == null || #product.title == null")
     @PostMapping("/products")
-    public ResponseEntity<Product> createProduct(@RequestBody CreateProductRequestDTO request) {
-        Product product = productService.createProduct(request);
-        return new ResponseEntity<>(product, HttpStatus.CREATED);
+    public Product createProduct(@RequestBody CreateProductRequestDTO request) {
+        return productService.createProduct(request);
+        // return new ResponseEntity<>(product, HttpStatus.CREATED);
     }
 
     // 2. get a single product
+    @Cacheable(value = "product")
     @GetMapping("/products/{Id}")
-    public ResponseEntity<Product> getSingleProductDetails(@PathVariable("Id") Long productId) throws ProductNotFoundException {
-        Product product = productService.getSingleProduct(productId);
-        return new ResponseEntity<>(product, HttpStatus.FOUND);
+    public Product getSingleProductDetails(@PathVariable("Id") Long productId) throws ProductNotFoundException {
+        return productService.getSingleProduct(productId);
+        // return new ResponseEntity<>(product, HttpStatus.FOUND);
     }
 
     // 3. update a product
+    @CachePut(value = "product", key = "#productId", unless = "#product == null || #product.title == null")
     @PutMapping("/products/{Id}")
-    public ResponseEntity<Product> updateProduct(@PathVariable("Id") Long productId,
+    public Product updateProduct(@PathVariable("Id") Long productId,
                                  @RequestBody UpdateProductRequestDTO updateRequest) throws ProductNotFoundException  {
-        Product product = productService.updateProduct(productId, updateRequest);
-        return new ResponseEntity<>(product, HttpStatus.ACCEPTED);
+        return productService.updateProduct(productId, updateRequest);
+        // return new ResponseEntity<>(product, HttpStatus.ACCEPTED);
     }
 
     // 4. delete a product
+    @CacheEvict(value = "product", key = "#productId")
     @DeleteMapping("/products/{Id}")
-    public ResponseEntity<String> deleteProduct(@PathVariable("Id") Long productId) throws ProductNotFoundException {
-        String message = productService.deleteProduct(productId);
-        return new ResponseEntity<>(message, HttpStatus.ACCEPTED);
+    public Long deleteProduct(@PathVariable("Id") Long productId) throws ProductNotFoundException {
+        return productService.deleteProduct(productId);
+        // return new ResponseEntity<>(message, HttpStatus.ACCEPTED);
     }
 
     // 5. get all categories
