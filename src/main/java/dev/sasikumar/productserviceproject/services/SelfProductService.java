@@ -1,7 +1,5 @@
 package dev.sasikumar.productserviceproject.services;
 
-import dev.sasikumar.productserviceproject.DTOs.CreateProductRequestDTO;
-import dev.sasikumar.productserviceproject.DTOs.UpdateProductRequestDTO;
 import dev.sasikumar.productserviceproject.exceptions.NotValidCategoryException;
 import dev.sasikumar.productserviceproject.exceptions.ProductNotFoundException;
 import dev.sasikumar.productserviceproject.models.Category;
@@ -34,44 +32,49 @@ public class SelfProductService implements ProductService{
     }
 
     @Override
-    public Product createProduct(CreateProductRequestDTO request) {
-        Product create = request.toProduct();
-        Category category = categoryRepository.findByTitle(request.getCategory());
-        if(category == null){
-            category = new Category();
-            category.setTitle(request.getCategory());
+    public Product createProduct(String title, Double price, String category, String description, String image) {
+        Product product = new Product();
+        product.setTitle(title);
+        product.setPrice(price);
+        product.setDescription(description);
+        product.setImageUrl(image);
+
+        Category productCategory = categoryRepository.findByTitle(category);
+        if(productCategory == null){
+            productCategory = new Category();
+            productCategory.setTitle(category);
         }
-        create.setCategory(category);
-        return productRepository.save(create);
+        product.setCategory(productCategory);
+        return productRepository.save(product);
     }
 
     @Override
-    public Product updateProduct(Long productId, UpdateProductRequestDTO request) throws ProductNotFoundException {
-        Product product = getSingleProduct(productId);
+    public Product updateProduct(Long productId, String title, Double price, String category, String description, String image) throws ProductNotFoundException {
+        Product product = getSingleProduct(productId);  //throws exception, if product is not available
 
         product.setId(productId);
-        if(request.getTitle() != null){
-            product.setTitle(request.getTitle());
+        if(title != null){
+            product.setTitle(title);
         }
-        if(request.getPrice() != null){
-            product.setPrice(request.getPrice());
+        if(price != null){
+            product.setPrice(price);
         }
-        if(request.getDescription() != null){
-            product.setDescription(request.getDescription());
+        if(description != null){
+            product.setDescription(description);
         }
-        if(request.getImage() != null){
-            product.setImageUrl(request.getImage());
+        if(image != null){
+            product.setImageUrl(image);
         }
-        if(request.getCategory() != null){
-            product.getCategory().setTitle(request.getCategory());
+        if(category != null){
+            product.getCategory().setTitle(title);
         }
 
-        Category category = categoryRepository.findByTitle(request.getCategory());
-        if(category == null){
-            category = new Category();
-            category.setTitle(request.getCategory());
+        Category productCategory = categoryRepository.findByTitle(category);
+        if(productCategory == null){
+            productCategory = new Category();
+            productCategory.setTitle(category);
         }
-        product.setCategory(category);
+        product.setCategory(productCategory);
         return productRepository.save(product);
     }
 

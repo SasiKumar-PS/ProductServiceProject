@@ -1,7 +1,5 @@
 package dev.sasikumar.productserviceproject.services;
 
-import dev.sasikumar.productserviceproject.DTOs.CreateProductRequestDTO;
-import dev.sasikumar.productserviceproject.DTOs.UpdateProductRequestDTO;
 import dev.sasikumar.productserviceproject.exceptions.NotValidCategoryException;
 import dev.sasikumar.productserviceproject.exceptions.ProductNotFoundException;
 import dev.sasikumar.productserviceproject.models.Category;
@@ -12,9 +10,9 @@ import java.util.List;
 public interface ProductService {
     Product getSingleProduct(Long productId) throws ProductNotFoundException;
 
-    Product createProduct(CreateProductRequestDTO request);
+    Product createProduct(String title, Double price, String category, String description, String image);
 
-    Product updateProduct(Long productId, UpdateProductRequestDTO request) throws ProductNotFoundException;
+    Product updateProduct(Long productId, String title, Double price, String category, String description, String image) throws ProductNotFoundException;
 
     Long deleteProduct(Long productId) throws ProductNotFoundException;
 

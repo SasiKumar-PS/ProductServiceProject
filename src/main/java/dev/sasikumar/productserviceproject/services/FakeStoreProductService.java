@@ -1,8 +1,6 @@
 package dev.sasikumar.productserviceproject.services;
 
-import dev.sasikumar.productserviceproject.DTOs.CreateProductRequestDTO;
 import dev.sasikumar.productserviceproject.DTOs.FakeStoreProductsDTO;
-import dev.sasikumar.productserviceproject.DTOs.UpdateProductRequestDTO;
 import dev.sasikumar.productserviceproject.exceptions.NotValidCategoryException;
 import dev.sasikumar.productserviceproject.exceptions.ProductNotFoundException;
 import dev.sasikumar.productserviceproject.models.Category;
@@ -25,7 +23,13 @@ public class FakeStoreProductService implements ProductService{
 
 
     @Override
-    public Product createProduct(CreateProductRequestDTO request) {
+    public Product createProduct(String title, Double price, String category, String description, String image) {
+        FakeStoreProductsDTO request = new FakeStoreProductsDTO();
+        request.setTitle(title);
+        request.setPrice(price);
+        request.setCategory(category);
+        request.setDescription(description);
+        request.setImage(image);
 
         FakeStoreProductsDTO response = restTemplate.postForObject(
                 "https://fakestoreapi.com/products",
@@ -53,7 +57,14 @@ public class FakeStoreProductService implements ProductService{
     }
 
     @Override
-    public Product updateProduct(Long productId, UpdateProductRequestDTO request) {
+    public Product updateProduct(Long productId, String title, Double price, String category, String description, String image) {
+        FakeStoreProductsDTO request = new FakeStoreProductsDTO();
+        request.setId(productId);
+        request.setTitle(title);
+        request.setPrice(price);
+        request.setCategory(category);
+        request.setDescription(description);
+        request.setImage(image);
 
         restTemplate.put(
                 "https://fakestoreapi.com/products/" + productId,
@@ -82,6 +93,8 @@ public class FakeStoreProductService implements ProductService{
                 "https://fakestoreapi.com/products",
                 FakeStoreProductsDTO[].class
         );
+        if(response == null) return null;
+
         List<Product> allProducts = new ArrayList<>();
 
         for(FakeStoreProductsDTO fakeStoreProducts : response){
@@ -99,10 +112,11 @@ public class FakeStoreProductService implements ProductService{
 
     @Override
     public List<Category> getAllCategories() {
-        List<String> allCategoryList = restTemplate.getForObject(
+        String[] allCategoryList = restTemplate.getForObject(
                 "https://fakestoreapi.com/products/categories",
-                List.class
+                String[].class
         );
+        if(allCategoryList == null) return null;
 
         List<Category> allCategory = new ArrayList<>();
         for(String category : allCategoryList) {
@@ -122,7 +136,7 @@ public class FakeStoreProductService implements ProductService{
                 FakeStoreProductsDTO[].class
         );
 
-        if(response.length == 0){
+        if(response == null){
             throw new NotValidCategoryException("Category name : " + category + " is not valid a category, please provide valid category name.");
         }
 

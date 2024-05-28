@@ -20,8 +20,9 @@ public class Sales implements Serializable {
     @Id
     @GeneratedValue(strategy =  GenerationType.AUTO)
     private Long id;
-    private Long productId;
-    private int quantity;
     private Double amount;
     private String currency;
+    private String name;
+    private String email;
+    private String phoneNumber;
 }
